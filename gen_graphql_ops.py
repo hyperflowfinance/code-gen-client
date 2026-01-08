@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+
 import httpx
 from graphql import (
     build_client_schema,
@@ -10,6 +11,7 @@ from graphql import (
     is_object_type,
     is_scalar_type,
 )
+
 
 def unwrap(t):
     while is_non_null_type(t) or is_list_type(t):
@@ -59,9 +61,8 @@ def main():
             var_defs = []
             var_args = []
             for aname, arg in field.args.items():
-                if is_non_null_type(arg.type):
-                    var_defs.append(f"${aname}: {arg.type}")
-                    var_args.append(f"{aname}: ${aname}")
+                var_defs.append(f"${aname}: {arg.type}")
+                var_args.append(f"{aname}: ${aname}")
             vars_str = f"({', '.join(var_defs)})" if var_defs else ""
             args_str = f"({', '.join(var_args)})" if var_args else ""
             sel = selection(field.type, args.depth, set())

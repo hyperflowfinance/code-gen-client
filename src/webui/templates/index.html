@@ -5,84 +5,87 @@
     <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
       GraphQL Client UI
     </h1>
-    <p class="text-xl text-gray-300">Quick actions for your generated client</p>
+    <p class="text-xl text-gray-300">Auto-generated controls for client methods</p>
     <div class="mt-4 text-sm text-gray-400">
       Endpoint:
       <span class="font-mono text-gray-200">{{ graphql_url }}</span>
     </div>
   </div>
 
+  <div class="mb-6 bg-gray-800/70 border border-gray-700 rounded-lg p-4 fade-in">
+    <div class="text-sm text-gray-300">
+      Tips: use JSON for complex inputs (objects or lists). Empty optional fields are ignored.
+    </div>
+  </div>
+
   <div class="grid gap-6 md:grid-cols-2">
-    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg fade-in">
-      <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-4">
-        <h2 class="text-2xl font-bold">Metadata</h2>
-      </div>
-      <div class="p-4">
-        <p class="text-gray-300 text-sm">Fetch basic node metadata.</p>
-        <form class="mt-4" hx-post="/metadata" hx-target="#result-metadata" hx-swap="innerHTML">
-          <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded" type="submit">
-            Run query_metadata
-          </button>
-        </form>
-        <div id="result-metadata"></div>
-      </div>
-    </div>
+    {% for op in operations %}
+      <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg fade-in">
+        <div class="bg-gradient-to-r from-{{ op.theme }}-600 to-{{ op.theme }}-800 p-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-bold">{{ op.name }}</h2>
+            <span class="bg-{{ op.theme }}-500 text-white px-2 py-1 rounded text-xs">{{ op.kind_label }}</span>
+          </div>
+        </div>
+        <div class="p-4">
+          <form
+            class="space-y-3"
+            hx-post="/run/{{ op.name }}"
+            hx-target="#result-{{ op.name }}"
+            hx-swap="innerHTML"
+          >
+            {% if op.params %}
+              {% for param in op.params %}
+                <div>
+                  <label class="text-xs uppercase tracking-wide text-gray-400">
+                    {{ param.name }}
+                    {% if param.required %}
+                      <span class="text-red-400">*</span>
+                    {% endif %}
+                    <span class="text-gray-500">({{ param.type_name }})</span>
+                  </label>
+                  {% if param.input_type == "textarea" %}
+                    <textarea
+                      class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-gray-100 h-24"
+                      name="{{ param.name }}"
+                      placeholder="{{ param.placeholder }}"
+                      {% if param.required %}required{% endif %}
+                    ></textarea>
+                  {% elif param.input_type == "checkbox" %}
+                    <div class="mt-2 flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        name="{{ param.name }}"
+                        class="h-4 w-4"
+                        {% if param.required %}required{% endif %}
+                      />
+                      <span class="text-sm text-gray-300">true</span>
+                    </div>
+                  {% else %}
+                    <input
+                      class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-gray-100"
+                      type="{{ param.input_type }}"
+                      name="{{ param.name }}"
+                      placeholder="{{ param.placeholder }}"
+                      {% if param.required %}required{% endif %}
+                    />
+                  {% endif %}
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="text-sm text-gray-400">No parameters.</div>
+            {% endif %}
 
-    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg fade-in">
-      <div class="bg-gradient-to-r from-green-600 to-green-800 p-4">
-        <h2 class="text-2xl font-bold">Usage</h2>
+            <button
+              class="bg-{{ op.theme }}-500 hover:bg-{{ op.theme }}-600 text-white font-semibold px-4 py-2 rounded"
+              type="submit"
+            >
+              Run {{ op.name }}
+            </button>
+          </form>
+          <div id="result-{{ op.name }}"></div>
+        </div>
       </div>
-      <div class="p-4">
-        <p class="text-gray-300 text-sm">View usage statistics.</p>
-        <form class="mt-4" hx-post="/usage" hx-target="#result-usage" hx-swap="innerHTML">
-          <button class="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded" type="submit">
-            Run query_usage_stat
-          </button>
-        </form>
-        <div id="result-usage"></div>
-      </div>
-    </div>
-
-    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg fade-in">
-      <div class="bg-gradient-to-r from-purple-600 to-purple-800 p-4">
-        <h2 class="text-2xl font-bold">Web3Sha3</h2>
-      </div>
-      <div class="p-4">
-        <p class="text-gray-300 text-sm">Hash a hex-encoded message.</p>
-        <form class="mt-4 space-y-3" hx-post="/web3sha3" hx-target="#result-web3" hx-swap="innerHTML">
-          <input
-            class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-gray-100"
-            name="message"
-            placeholder="0x68656c6c6f"
-            required
-          />
-          <button class="bg-purple-500 hover:bg-purple-600 text-white font-semibold px-4 py-2 rounded" type="submit">
-            Run web3_sha3
-          </button>
-        </form>
-        <div id="result-web3"></div>
-      </div>
-    </div>
-
-    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg fade-in">
-      <div class="bg-gradient-to-r from-yellow-600 to-yellow-800 p-4">
-        <h2 class="text-2xl font-bold">Send Raw Transaction</h2>
-      </div>
-      <div class="p-4">
-        <p class="text-gray-300 text-sm">Broadcast a signed transaction.</p>
-        <form class="mt-4 space-y-3" hx-post="/sendraw" hx-target="#result-sendraw" hx-swap="innerHTML">
-          <textarea
-            class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-gray-100 h-24"
-            name="signed_tx"
-            placeholder="0x..."
-            required
-          ></textarea>
-          <button class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-4 py-2 rounded" type="submit">
-            Run send_raw
-          </button>
-        </form>
-        <div id="result-sendraw"></div>
-      </div>
-    </div>
+    {% endfor %}
   </div>
 {% endblock %}

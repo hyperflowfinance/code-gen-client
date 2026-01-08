@@ -1,5 +1,5 @@
-from dataclasses import dataclass
 import inspect
+from dataclasses import dataclass
 from typing import Any
 
 from gql_client import Client

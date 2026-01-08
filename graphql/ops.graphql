@@ -1,0 +1,11 @@
+query query_metadata { metadata { clientVersion chainId netVersion netListening netPeerCount } }
+
+query query_ethSyncing { ethSyncing }
+
+query query_web3Sha3($message: String!) { web3Sha3(message: $message) }
+
+query query_transactions($input: TransactionQueryInput) { transactions(input: $input) { items { blockNumber txIndex hash fromAddress toAddress valueWei gas gasPrice gasUsed nonce txType maxFeePerGas maxPriorityFeePerGas input success logsCount createdAt logs { blockNumber txIndex logIndex txHash blockHash address topics data removed createdAt } internalTransactions { blockNumber txHash traceIndex traceAddress fromAddress toAddress valueWei callType gas gasUsed input output error success createdAt } } pageInfo { hasNextPage hasPreviousPage totalCount currentPage totalPages } } }
+
+query query_usageStat { usageStat { effectiveness jsonrpcRatio } }
+
+mutation mutation_sendRawTransaction($signedTx: String, $from: String, $to: String, $value: String, $gas: String, $gasPrice: String, $input: String, $nonce: Int) { sendRawTransaction(signedTx: $signedTx, from: $from, to: $to, value: $value, gas: $gas, gasPrice: $gasPrice, input: $input, nonce: $nonce) }
