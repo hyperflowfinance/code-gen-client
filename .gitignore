@@ -1,0 +1,25 @@
+.vscode
+__pycache__/
+*.py[codz]
+*$py.class
+.ruff_cache
+.pytest_cache
+.env
+
+# Coverage reports
+.coverage
+.coverage.*
+.tox/
+coverage.xml
+*.cover
+.hypothesis/
+htmlcov/*
+htmlcov
+
+dev_commands.txt
+eth_doc.txt
+/uv.lock
+.idea
+/.junie/
+/.claude/
+/.venv/
