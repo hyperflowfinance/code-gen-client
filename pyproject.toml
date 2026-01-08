@@ -1,4 +1,5 @@
 [tool.ariadne-codegen]
 remote_schema_url = "http://localhost:8000/anvil/graphql"
-queries_path = "graphql"
+queries_path = "auto.graphql"
 target_package_name = "gql_client"
+

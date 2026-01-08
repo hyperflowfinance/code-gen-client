@@ -25,6 +25,32 @@ schema.
    ariadne-codegen
    ```
 
+## Using env vars for `remote_schema_url`
+
+`ariadne-codegen` does not expand env vars inside `remote_schema_url` in
+`pyproject.toml`. If you want the URL built from env, generate a temporary
+config file and pass it with `--config`.
+
+Bash example:
+
+```bash
+export GRAPHQL_SCHEME=http
+export GRAPHQL_HOST=localhost
+export GRAPHQL_PORT=8000
+export GRAPHQL_CHAIN=anvil
+
+url="${GRAPHQL_SCHEME}://${GRAPHQL_HOST}:${GRAPHQL_PORT}/${GRAPHQL_CHAIN}/graphql"
+
+cat > pyproject.codegen.toml <<EOF
+[tool.ariadne-codegen]
+remote_schema_url = "${url}"
+queries_path = "graphql"
+target_package_name = "gql_client"
+EOF
+
+ariadne-codegen --config ./pyproject.codegen.toml
+```
+
 ## Usage example
 
 ```python
@@ -32,7 +58,7 @@ import asyncio
 from gql_client import Client
 
 async def main():
-    client = Client(url="http://localhost:8000/anvil/graphql")
+    client = Client(url="http://localhost:8000/YOUR_CHAIN/graphql")
     data = await client.query_metadata()
     print(data)
 
