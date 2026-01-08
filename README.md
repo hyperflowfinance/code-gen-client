@@ -39,6 +39,23 @@ async def main():
 asyncio.run(main())
 ```
 
+## Web UI (FastAPI + HTMX)
+
+Install dependencies:
+
+```bash
+pip install fastapi jinja2 uvicorn
+```
+
+Run the UI:
+
+```bash
+python -m uvicorn webui.main:app --reload --app-dir src
+```
+
+The UI reads `GRAPHQL_*` values from `.env` and shows buttons/forms for the
+generated client operations.
+
 ## Using env vars for `remote_schema_url`
 
 `ariadne-codegen` does not expand env vars inside `remote_schema_url` in
@@ -55,17 +72,17 @@ export GRAPHQL_CHAIN=your_chain
 
 url="${GRAPHQL_SCHEME}://${GRAPHQL_HOST}:${GRAPHQL_PORT}/${GRAPHQL_CHAIN}/graphql"
 
-cat > pyproject.toml <<EOF
+cat > pyproject.codegen.toml <<EOF
 [tool.ariadne-codegen]
 remote_schema_url = "${url}"
 queries_path = "graphql"
 target_package_name = "gql_client"
 EOF
 
-ariadne-codegen --config ./pyproject.toml
+ariadne-codegen --config ./pyproject.codegen.toml
 ```
 
-Windows (PowerShell) example
+## Windows (PowerShell) example
 
 ```powershell
 $env:GRAPHQL_SCHEME = "http"
@@ -79,7 +96,7 @@ $url = "$($env:GRAPHQL_SCHEME)://$($env:GRAPHQL_HOST):$($env:GRAPHQL_PORT)/$($en
 remote_schema_url = "$url"
 queries_path = "graphql"
 target_package_name = "gql_client"
-"@ | Set-Content -Path .\pyproject.toml -Encoding utf8
+"@ | Set-Content -Path .\pyproject.codegen.toml -Encoding utf8
 
-ariadne-codegen --config .\pyproject.toml
+ariadne-codegen --config .\pyproject.codegen.toml
 ```

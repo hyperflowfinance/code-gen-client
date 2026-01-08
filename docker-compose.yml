@@ -1,0 +1,29 @@
+services:
+  codegen-gql:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        APP_ENV: ${APP_ENV}
+    image: codegen-gql:latest
+    container_name: codegen-api
+    ports:
+      - "8888:8888"
+    env_file:
+      - .env.example
+    environment:
+      APP_ENV: ${APP_ENV}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - hyperflow-network
+
+networks:
+  hyperflow-network:
+    external: true
+    name: hyperflow-dev-network

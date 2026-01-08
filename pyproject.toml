@@ -1,5 +1,142 @@
+[project]
+name = "codegen"
+version = "0.1.0"
+description = "GraphQL codegen client and web UI"
+package-mode = false
+authors = [
+    {name = "dimakohanskyi",email = "dimakohanskyi@gmail.com"}
+]
+requires-python = ">=3.12,<3.15"
+
+dependencies = [
+    "ariadne-codegen (>=0.17.0,<0.18.0)",
+    "fastapi (>=0.121.1,<0.122.0)",
+    "graphql-core (>=3.2.3,<4.0.0)",
+    "httpx (>=0.28.1,<0.29.0)",
+    "jinja2 (>=3.1.4,<4.0.0)",
+    "pydantic (>=2.12.0,<3.0.0)",
+    "python-multipart (>=0.0.9,<0.0.10)",
+    "uvicorn[standard] (>=0.38.0,<0.39.0)"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2,<9",
+    "pytest-asyncio>=1.2.0,<2.0.0",
+    "ruff>=0.14.4,<0.15.0",
+    "pyright>=1.1.407,<2.0.0",
+    "pre-commit>=4.4.0,<5.0.0",
+    "pytest-cov>=7.0.0,<8.0.0"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+packages = [
+    { include = "webui", from = "src" }
+]
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=8.2,<9"
+pytest-asyncio = "^1.2.0"
+ruff = "^0.14.4"
+pyright = "^1.1.407"
+pre-commit = "^4.4.0"
+httpx = "^0.28.1"
+pytest-cov = "^7.0.0"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+addopts = [
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=xml",
+    "--cov-report=html",
+    "--cov-fail-under=80",
+    "--ignore=gen_graphql_ops.py",
+    "--ignore=gql_client",
+    "--ignore=graphql",
+    "--ignore=.venv"
+]
+
+[tool.coverage.run]
+source = ["src"]
+relative_files = true
+omit = [
+    "*/__pycache__/*",
+    "*/tests/*",
+    "gen_graphql_ops.py",
+    "gql_client/*",
+    "graphql/*",
+    ".venv/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:"
+]
+
+
+[tool.ruff]
+src = ["src", "tests"]
+line-length = 88
+target-version = "py312"
+
+exclude = [
+    "__pycache__",
+    ".venv",
+    "gql_client",
+    "graphql",
+]
+
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle (errors)
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "UP", # pyupgrade
+    "N",  # naming conventions
+    "S",  # security
+    "C4", # flake8-comprehensions
+]
+
+ignore = [
+    "E501", # line length (handled by ruff format)
+]
+
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+known-first-party = ["src"]
+
+[tool.ruff.lint.per-file-ignores]
+# Example: ignore unused imports in __init__.py
+"__init__.py" = ["F401"]
+"tests/*" = ["S101"]
+
+
+[tool.pyright]
+include = ["src"]
+exclude = [
+    "**/node_modules",
+    "**/__pycache__",
+    ".venv",
+    "gql_client",
+    "graphql",
+]
+pythonVersion = "3.12"
+
+
 [tool.ariadne-codegen]
 remote_schema_url = "http://localhost:8000/anvil/graphql"
 queries_path = "auto.graphql"
 target_package_name = "gql_client"
-
