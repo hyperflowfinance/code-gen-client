@@ -24,6 +24,20 @@ schema.
    ```bash
    ariadne-codegen
    ```
+   
+## Usage example
+
+```python
+import asyncio
+from gql_client import Client
+
+async def main():
+    client = Client(url="http://localhost:8000/YOUR_CHAIN/graphql")
+    data = await client.query_metadata()
+    print(data)
+
+asyncio.run(main())
+```
 
 ## Using env vars for `remote_schema_url`
 
@@ -37,30 +51,35 @@ Bash example:
 export GRAPHQL_SCHEME=http
 export GRAPHQL_HOST=localhost
 export GRAPHQL_PORT=8000
-export GRAPHQL_CHAIN=anvil
+export GRAPHQL_CHAIN=your_chain
 
 url="${GRAPHQL_SCHEME}://${GRAPHQL_HOST}:${GRAPHQL_PORT}/${GRAPHQL_CHAIN}/graphql"
 
-cat > pyproject.codegen.toml <<EOF
+cat > pyproject.toml <<EOF
 [tool.ariadne-codegen]
 remote_schema_url = "${url}"
 queries_path = "graphql"
 target_package_name = "gql_client"
 EOF
 
-ariadne-codegen --config ./pyproject.codegen.toml
+ariadne-codegen --config ./pyproject.toml
 ```
 
-## Usage example
+Windows (PowerShell) example
 
-```python
-import asyncio
-from gql_client import Client
+```powershell
+$env:GRAPHQL_SCHEME = "http"
+$env:GRAPHQL_HOST = "localhost"
+$env:GRAPHQL_PORT = "8000"
+$env:GRAPHQL_CHAIN = "your_chain"
+$url = "$($env:GRAPHQL_SCHEME)://$($env:GRAPHQL_HOST):$($env:GRAPHQL_PORT)/$($env:GRAPHQL_CHAIN)/graphql"
 
-async def main():
-    client = Client(url="http://localhost:8000/YOUR_CHAIN/graphql")
-    data = await client.query_metadata()
-    print(data)
+@"
+[tool.ariadne-codegen]
+remote_schema_url = "$url"
+queries_path = "graphql"
+target_package_name = "gql_client"
+"@ | Set-Content -Path .\pyproject.toml -Encoding utf8
 
-asyncio.run(main())
+ariadne-codegen --config .\pyproject.toml
 ```
